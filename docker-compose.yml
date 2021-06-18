@@ -1,0 +1,33 @@
+version: "3.9"
+   
+services:
+  web:
+    build: .
+    image: django_image
+    command: make docker-run-dev
+    restart: always
+    ports:
+      - "8000:8000"
+    # volumes:
+    #   - .:/app
+    depends_on:
+      - postgres  
+  postgres:
+    image: postgres
+    restart: always
+    env_file:
+      - init_postgres.env
+    volumes:
+      - notion_inbox_bot_pgdata5:/var/lib/postgresql/data:rw      
+    ports:
+      - "5432:5432"
+  start_bot:
+    image: django_image
+    command: python manage.py start_bot
+    depends_on:
+      - postgres
+      - web
+
+volumes:
+  notion_inbox_bot_pgdata5:
+    # driver: local
